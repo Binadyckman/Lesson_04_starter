@@ -33,4 +33,12 @@ def test_duplicate_media_is_rejected(sample_event):
     with pytest.raises(selection_core.SelectionError) as err:
         selection_core.submit_selection(
             sample_event, "cli_100", ["med_1", "med_1"], ["add_to_album"])
-    assert err.value.code == "DUPLICATE_MEDIA"    
+    assert err.value.code == "DUPLICATE_MEDIA"   
+
+@pytest.mark.req("REQ-SEL-04")
+def test_rejected_selection_does_not_change_event(sample_event):
+    selections_before = list(sample_event.get("selections", []))
+    with pytest.raises(selection_core.SelectionError):
+        selection_core.submit_selection(
+            sample_event, "cli_100", ["med_9"], ["add_to_album"])
+    assert sample_event.get("selections", []) == selections_before
